@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from "cors";
 import dotenv from "dotenv";
+import accountRouter from "./routers/account.router"
 // Load environtment variable
 dotenv.config();
 const PORT: string = process.env.PORT || "5555";
@@ -16,6 +17,8 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
     res.status(200).send("<h1>ORM API Running</h1>")
 });
+
+app.use("/accounts", accountRouter);
 
 // Start Server
 app.listen(PORT, () => {
