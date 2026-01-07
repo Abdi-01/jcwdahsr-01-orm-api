@@ -33,6 +33,14 @@ export const getAccounts = async (req: Request, res: Response) => {
         // access prisma model with function
         const accounts = await prisma.account.findMany({
             where: filterData,
+            include: {
+                addresses: {
+                    omit: {
+                        id: true,
+                        accountId: true
+                    }
+                }
+            },
             omit: {
                 updatedAt: true
             },

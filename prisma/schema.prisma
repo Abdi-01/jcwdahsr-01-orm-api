@@ -22,9 +22,24 @@ model Account {
   age       Int?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+  addresses Address? // one-to-one
+  // addresses Address[] // one-to-many
 }
 
 enum GENDER {
   MALE
   FEMALE
+}
+
+model Address {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title      String
+  phone      String
+  adress     String
+  postalCode String
+  accountId  Int      @unique // one-to-one
+  // accountId  Int // one-to-many
+  createdAt  DateTime @default(now())
+
+  account Account @relation(fields: [accountId], references: [id])
 }
