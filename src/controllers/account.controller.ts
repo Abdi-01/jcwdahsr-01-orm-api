@@ -26,3 +26,42 @@ export const getAccounts = async (req: Request, res: Response) => {
         res.status(500).send(error);
     }
 }
+
+export const updateAccount = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        await prisma.account.update({
+            where: { id: Number(id as string) },
+            data: req.body
+        })
+
+        res.status(200).send({
+            success: true,
+            message: "Update data success"
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+export const deleteAccount = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        await prisma.account.delete({
+            where: { id: Number(id as string) },
+        })
+
+        res.status(200).send({
+            success: true,
+            message: "Delete data success"
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
