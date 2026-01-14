@@ -1,14 +1,59 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma";
 import { Account } from "../generated/prisma/client";
+import { hashPassword } from "../utils/hashPassword";
+import { compare } from "bcrypt";
 
 export const createAccount = async (req: Request, res: Response) => {
     try {
         const create = await prisma.account.create({
-            data: req.body
+            data: { ...req.body, password: await hashPassword(req.body.password) }
         })
 
         res.status(201).send("Create Account Success")
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
+    try {
+        const { email, newPassword } = req.body;
+        const update = await prisma.account.update({
+            where: { email },
+            data: { password: await hashPassword(newPassword) }
+        })
+
+        res.status(201).send("Reset Password Success")
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+export const login = async (req: Request, res: Response) => {
+    try {
+        // 1. get data from req.body
+        const { email, password } = req.body;
+        // 2. filter to prisma.account
+        const account = await prisma.account.findUnique({
+            where: {
+                email
+            }
+        })
+
+        if (!account) {
+            return res.status(404).send("Account not found")
+        }
+
+        // 3. compare password
+        const checkPassword = await compare(password, account?.password as string);
+        if (!checkPassword) {
+            return res.status(401).send("Wrong password")
+        }
+
+        res.status(200).send(account);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
