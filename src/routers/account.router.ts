@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createAccount, deleteAccount, getAccountById, getAccounts, getAgeAverage, login, resetPassword, updateAccount } from "../controllers/account.controller";
+import { verifyToken } from "../middleware/verifyTokent";
 
 const route: Router = Router();
 
@@ -11,7 +12,7 @@ route.post("/create", createAccount);
 route.patch("/reset-password", resetPassword);
 
 route.get("/:id", getAccountById);
-route.patch("/update/:id", updateAccount)
+route.patch("/update", verifyToken, updateAccount)
 route.delete("/remove/:id", deleteAccount)
 
 export default route;

@@ -3,6 +3,7 @@ import { prisma } from "../config/prisma";
 import { Account } from "../generated/prisma/client";
 import { hashPassword } from "../utils/hashPassword";
 import { compare } from "bcrypt";
+import { createToken } from "../utils/createToken";
 
 export const createAccount = async (req: Request, res: Response) => {
     try {
@@ -53,7 +54,17 @@ export const login = async (req: Request, res: Response) => {
             return res.status(401).send("Wrong password")
         }
 
-        res.status(200).send(account);
+        // create token
+        const token = createToken({ id: account.id });
+
+
+        res.status(200).send({
+            name: account.name,
+            email: account.email,
+            gender: account.gender,
+            age: account.age,
+            token
+        });
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -141,7 +152,9 @@ export const getAccountById = async (req: Request, res: Response) => {
 
 export const updateAccount = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        console.log("res locals data", res.locals);
+
+        const { id } = res.locals.decript;
 
         await prisma.account.update({
             where: { id: Number(id as string) },
